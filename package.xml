@@ -1,0 +1,22 @@
+<package format="2">
+  <name>monogs</name>
+  <version>1.0.0</version>
+  <description>
+    This software implements dense SLAM system presented in our paper <a href="https://arxiv.org/abs/2312.06741">Gaussian Splatting SLAM</a> in CVPR'24.
+    The method demonstrates the first monocular SLAM solely based on 3D Gaussian Splatting (left), which also supports Stereo/RGB-D inputs (middle/right).
+</description>
+
+  <maintainer email="12010508@mail.sustech.edu.cn">Eason Hua</maintainer>
+  <author email="h.matsuki20@imperial.ac.uk">Hidenobu Matsuki</author>
+
+  <license>Apache</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>std_msgs</depend>
+  <depend>rospy</depend>
+  <depend>roscpp</depend>
+
+  <export>
+  </export>
+</package>

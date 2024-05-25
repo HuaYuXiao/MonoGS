@@ -39,98 +39,67 @@ The method demonstrates the first monocular SLAM solely based on 3D Gaussian Spl
 </p>
 <br>
 
+![HitCount](https://img.shields.io/endpoint?url=https%3A%2F%2Fhits.dwyl.com%2FHuaYuXiao%2FMonoGS.json%3Fcolor%3Dpink)
+![Static Badge](https://img.shields.io/badge/ROS-noetic-22314E?logo=ros)
+![Static Badge](https://img.shields.io/badge/PyTorch-1.12.1-EE4C2C?logo=pytorch)
+![Static Badge](https://img.shields.io/badge/OpenCV-4.8.1.78-5C3EE8?logo=opencv)
+![Static Badge](https://img.shields.io/badge/Python-3.7.13-3776AB?logo=python)
+![Static Badge](https://img.shields.io/badge/Ubuntu-20.04.6-E95420?logo=ubuntu)
+
+
 # Note
 - In an academic paper, please refer to our work as **Gaussian Splatting SLAM** or **MonoGS** for short (this repo's name) to avoid confusion with other works.
 - Differential Gaussian Rasteriser with camera pose gradient computation is available [here](https://github.com/rmurai0610/diff-gaussian-rasterization-w-pose.git).
 - **[New]** Speed-up version of our code is available in `dev.speedup` branch, It achieves up to 10fps on monocular fr3/office sequence while keeping consistent performance (tested on RTX4090/i9-12900K). The code will be merged into the main branch after further refactoring and testing.
 
+
 # Getting Started
+
 ## Installation
+
 ```
-git clone https://github.com/muskie82/MonoGS.git --recursive
-cd MonoGS
+git clone https://github.com/HuaYuXiao/MonoGS.git --recursive
 ```
+
 Setup the environment.
 
 ```
+cd MonoGS
 conda env create -f environment.yml
-conda activate MonoGS
-```
-
-To run the code in `dev.speedup` branch,
-```
-pip install lycon
-pip install git+https://github.com/princeton-vl/lietorch.git 
 ```
 
 Depending on your setup, please change the dependency version of pytorch/cudatoolkit in `environment.yml` by following [this document](https://pytorch.org/get-started/previous-versions/).
 
-Our test setup were:
-- Ubuntu 20.04: `pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.6`
-- Ubuntu 18.04: `pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.3`
-
-## Quick Demo
 ```
-bash scripts/download_tum.sh
-python slam.py --config configs/mono/tum/fr3_office.yaml
+conda activate MonoGS
 ```
-You will see a GUI window pops up.
 
-## Downloading Datasets
-Running the following scripts will automatically download datasets to the `./datasets` folder.
-### TUM-RGBD dataset
+First, you'll need to install `pyrealsense2`. Inside the conda environment, run:
+
 ```bash
-bash scripts/download_tum.sh
+pip3 install pyrealsense2
+pip3 install lycon
+pip3 install git+https://github.com/princeton-vl/lietorch.git 
 ```
 
-### Replica dataset
 ```bash
-bash scripts/download_replica.sh
+catkin_make install --source src/MonoGS --build build/monogs
 ```
-
-### EuRoC MAV dataset
-```bash
-bash scripts/download_euroc.sh
-```
-
 
 
 ## Run
-### Monocular
-```bash
-python slam.py --config configs/mono/tum/fr3_office.yaml
-```
 
-### RGB-D
-```bash
-python slam.py --config configs/rgbd/tum/fr3_office.yaml
-```
+### Live demo with Realsense RGB-D
 
-```bash
-python slam.py --config configs/rgbd/replica/office0.yaml
-```
-Or the single process version as
-```bash
-python slam.py --config configs/rgbd/replica/office0_sp.yaml
-```
-
-
-### Stereo (experimental)
-```bash
-python slam.py --config configs/stereo/euroc/mh02.yaml
-```
-
-## Live demo with Realsense
-First, you'll need to install `pyrealsense2`.
-Inside the conda environment, run:
-```bash
-pip install pyrealsense2
-```
 Connect the realsense camera to the PC on a **USB-3** port and then run:
+
 ```bash
-python slam.py --config configs/live/realsense.yaml
+roslaunch monogs simulation.launch
 ```
-We tested the method with [Intel Realsense d455](https://www.mouser.co.uk/new/intel/intel-realsense-depth-camera-d455/). We recommend using a similar global shutter camera for robust camera tracking. Please avoid aggressive camera motion, especially before the initial BA is performed. Check out [the first 15 seconds of our YouTube video](https://youtu.be/x604ghp9R_Q?si=S21HgeVTVfNe0BVL) to see how you should move the camera for initialisation. We recommend to use the code in `dev.speedup` branch for live demo.
+
+You will see a GUI window pops up.
+
+We tested the method with [Intel Realsense d455](https://www.mouser.co.uk/new/intel/intel-realsense-depth-camera-d455/). We recommend using a similar global shutter camera for robust camera tracking. Please avoid aggressive camera motion, especially before the initial BA is performed. Check out [the first 15 seconds of our YouTube video](https://youtu.be/x604ghp9R_Q?si=S21HgeVTVfNe0BVL) to see how you should move the camera for initialisation. We recommend to use the code in `dev.speed-up` branch for live demo.
 
 <p align="center">
   <a href="">
@@ -138,32 +107,55 @@ We tested the method with [Intel Realsense d455](https://www.mouser.co.uk/new/in
   </a>
 </p>
 
+### Monocular
+
+```bash
+python3 slam.py --config configs/mono/tum/fr3_office.yaml
+```
+
+### Stereo (experimental)
+
+```bash
+python3 slam.py --config configs/stereo/euroc/mh02.yaml
+```
+
+
 # Evaluation
+
 <!-- To evaluate the method, please run the SLAM system with `save_results=True` in the base config file. This setting automatically outputs evaluation metrics in wandb and exports log files locally in save_dir. For benchmarking purposes, it is recommended to disable the GUI by setting `use_gui=False` in order to maximise GPU utilisation. For evaluating rendering quality, please set the `eval_rendering=True` flag in the configuration file. -->
 To evaluate our method, please add `--eval` to the command line argument:
+
 ```bash
-python slam.py --config configs/mono/tum/fr3_office.yaml --eval
+python3 slam.py --config configs/mono/tum/fr3_office.yaml --eval
 ```
+
 This flag will automatically run our system in a headless mode, and log the results including the rendering metrics.
 
+
 # Reproducibility
+
 There might be minor differences between the released version and the results in the paper. Please bear in mind that multi-process performance has some randomness due to GPU utilisation.
 We run all our experiments on an RTX 4090, and the performance may differ when running with a different GPU.
 
+
 # Acknowledgement
+
 This work incorporates many open-source codes. We extend our gratitude to the authors of the software.
 - [3D Gaussian Splatting](https://github.com/graphdeco-inria/gaussian-splatting)
-- [Differential Gaussian Rasterization
-](https://github.com/graphdeco-inria/diff-gaussian-rasterization)
+- [Differential Gaussian Rasterization](https://github.com/graphdeco-inria/diff-gaussian-rasterization)
 - [SIBR_viewers](https://gitlab.inria.fr/sibr/sibr_core)
 - [Tiny Gaussian Splatting Viewer](https://github.com/limacv/GaussianSplattingViewer)
 - [Open3D](https://github.com/isl-org/Open3D)
 - [Point-SLAM](https://github.com/eriksandstroem/Point-SLAM)
 
+
 # License
-MonoGS is released under a **LICENSE.md**. For a list of code dependencies which are not property of the authors of MonoGS, please check **Dependencies.md**.
+
+MonoGS is released under a **LICENSE**. For a list of code dependencies which are not property of the authors of MonoGS, please check **Dependencies.md**.
+
 
 # Citation
+
 If you found this code/work to be useful in your own research, please considering citing the following:
 
 ```bibtex
@@ -173,18 +165,4 @@ If you found this code/work to be useful in your own research, please considerin
   booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
   year={2024}
 }
-
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-

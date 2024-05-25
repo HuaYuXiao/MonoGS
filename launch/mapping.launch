@@ -1,0 +1,8 @@
+<launch>
+    <!-- TF for world-->
+    <!-- 统一mavros发布的map系与world系 -->
+    <node pkg="tf" type="static_transform_publisher" name="tf_world_map"
+          args="0 0 0 0 0 0 world map 100"/>
+
+    <node pkg="uav_octomapping" type="pcl_merge" name="pcl_merge"/>
+</launch>

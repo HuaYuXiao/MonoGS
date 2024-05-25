@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="monogs" type="slam.py" name="monogs"
+          args="$(find monogs)/configs/live/realsense_rgbd.yaml" launch-prefix="gnome-terminal --"/>
+</launch>
